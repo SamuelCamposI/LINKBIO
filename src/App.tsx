@@ -1,156 +1,86 @@
 import { motion } from 'framer-motion'
-import { BookOpen, ChevronRight, Link2 } from 'lucide-react'
-import type { ReactNode } from 'react'
-
-type SocialLink = {
-  id: string
-  label: string
-  href: string
-  icon: ReactNode
-}
+import {
+  ArrowUpRight,
+  BarChart3,
+  Bell,
+  Check,
+  ChevronDown,
+  CreditCard,
+  ExternalLink,
+  Eye,
+  LayoutDashboard,
+  Link2,
+  Menu,
+  Palette,
+  Plus,
+  Settings,
+  Sparkles,
+  TrendingUp,
+  UserRound,
+  X,
+} from 'lucide-react'
+import { useState } from 'react'
 
 const PROFILE = {
   name: 'fckn.daybeat',
-  bio: 'Contenido, ritmo y vibes diarias',
   avatar: '/avatar.png',
-  featured: {
-    label: 'Algo Bien',
-    href: 'https://www.youtube.com',
-  },
+  featured: '/fckn.daybeat',
 }
 
-const LINKS: SocialLink[] = [
-  {
-    id: 'youtube',
-    label: 'YouTube',
-    href: 'https://www.youtube.com',
-    icon: <YouTubeIcon />,
-  },
-  {
-    id: 'tiktok',
-    label: 'TikTok',
-    href: 'https://www.tiktok.com',
-    icon: <TikTokIcon />,
-  },
-  {
-    id: 'instagram',
-    label: 'Instagram',
-    href: 'https://www.instagram.com',
-    icon: <InstagramIcon />,
-  },
-  {
-    id: 'blog',
-    label: 'Blog personal',
-    href: 'https://www.google.com',
-    icon: <BookOpen className="size-6" strokeWidth={2.25} />,
-  },
+const NAV_ITEMS = [
+  { label: 'Estadisticas', icon: BarChart3 },
+  { label: 'Personalizacion', icon: Palette },
+  { label: 'Suscripciones', icon: CreditCard },
 ]
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.25 },
-  },
-}
+const STATS = [
+  { label: 'Visitas totales', value: '24,892', change: '+18.4%', icon: Eye, color: 'text-sky-300' },
+  { label: 'Clicks en enlaces', value: '8,406', change: '+12.8%', icon: Link2, color: 'text-neon-soft' },
+  { label: 'Conversiones', value: '1,284', change: '+8.2%', icon: TrendingUp, color: 'text-amber' },
+]
 
-const item = {
-  hidden: { opacity: 0, y: 22 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring' as const, stiffness: 320, damping: 24 },
-  },
-}
+const TOP_LINKS = [
+  { name: 'YouTube', clicks: '3,204', percent: 78, color: 'bg-neon' },
+  { name: 'TikTok', clicks: '2,510', percent: 61, color: 'bg-amber' },
+  { name: 'Instagram', clicks: '1,692', percent: 43, color: 'bg-sky-400' },
+]
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('Estadisticas')
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  const selectTab = (label: string) => {
+    setActiveTab(label)
+    setMobileNavOpen(false)
+  }
+
   return (
     <div className="relative min-h-dvh overflow-hidden bg-midnight text-white">
       <BackgroundFx />
-
-      <main className="relative z-10 mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-10 pt-12 sm:px-6">
-        <motion.header
-          className="flex flex-col items-center text-center"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="avatar-glow relative rounded-full p-[3px]">
-            <img
-              src={PROFILE.avatar}
-              alt={PROFILE.name}
-              width={128}
-              height={128}
-              className="size-28 rounded-full object-cover sm:size-32"
-              draggable={false}
-            />
-          </div>
-
-          <h1 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-amber sm:text-4xl">
-            {PROFILE.name}
-          </h1>
-          <p className="mt-2 max-w-[16rem] text-sm font-medium text-white/55">
-            {PROFILE.bio}
-          </p>
-
-          <motion.a
-            href={PROFILE.featured.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cta-shimmer mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-white via-white to-pink-100 px-5 py-2.5 text-sm font-bold text-ink shadow-[0_10px_30px_-12px_rgba(255,255,255,0.65)] transition will-change-transform hover:scale-[1.04] active:scale-[0.98]"
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Link2 className="size-4 text-sky-500" strokeWidth={2.5} />
-            {PROFILE.featured.label}
-          </motion.a>
-        </motion.header>
-
-        <motion.nav
-          className="mt-8 flex flex-1 flex-col gap-3.5"
-          variants={container}
-          initial="hidden"
-          animate="show"
-          aria-label="Enlaces principales"
-        >
-          {LINKS.map((link) => (
-            <motion.a
-              key={link.id}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              variants={item}
-              whileHover={{ scale: 1.03, x: 2 }}
-              whileTap={{ scale: 0.985 }}
-              className="group flex items-center gap-4 rounded-3xl border border-neon/35 bg-plum/55 px-4 py-3.5 backdrop-blur-md transition-colors hover:border-neon/80 hover:bg-plum/80 hover:shadow-[0_0_28px_-8px_rgba(236,72,153,0.55)]"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-midnight/80 text-amber ring-1 ring-amber/25 transition group-hover:text-amber-hot group-hover:ring-neon/40">
-                {link.icon}
-              </span>
-              <span className="flex-1 text-left text-base font-bold tracking-wide text-white">
-                {link.label}
-              </span>
-              <ChevronRight
-                className="size-5 text-amber transition group-hover:translate-x-0.5 group-hover:text-neon-soft"
-                strokeWidth={2.5}
-              />
-            </motion.a>
-          ))}
-        </motion.nav>
-
-        <motion.footer
-          className="mt-10 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.5 }}
-        >
-          <p className="font-display text-[11px] font-bold uppercase tracking-[0.18em] text-amber/90">
-            Creado para creadores de contenido
-          </p>
-        </motion.footer>
-      </main>
+      <div className="relative z-10 flex min-h-dvh">
+        <aside className={`fixed inset-y-0 left-0 z-30 w-72 border-r border-white/10 bg-void/95 px-5 py-6 backdrop-blur-xl transition-transform lg:static lg:translate-x-0 ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex items-center justify-between"><a href="#inicio" className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-xl bg-neon text-white shadow-[0_0_24px_-8px_rgba(236,72,153,0.9)]"><Link2 className="size-5" /></span><span className="font-display text-lg font-extrabold tracking-tight">fckn<span className="text-amber">.</span>daybeat</span></a><button type="button" onClick={() => setMobileNavOpen(false)} className="text-white/60 lg:hidden" aria-label="Cerrar menu"><X className="size-5" /></button></div>
+          <div className="mt-12 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Workspace</div>
+          <nav className="mt-3 space-y-2" aria-label="Navegacion del dashboard"><NavButton active={activeTab === 'Inicio'} icon={LayoutDashboard} onClick={() => selectTab('Inicio')}>Inicio</NavButton>{NAV_ITEMS.map(({ label, icon: Icon }) => <NavButton key={label} active={activeTab === label} icon={Icon} onClick={() => selectTab(label)}>{label}</NavButton>)}</nav>
+          <div className="absolute bottom-6 left-5 right-5 rounded-2xl border border-amber/20 bg-amber/10 p-4"><Sparkles className="size-5 text-amber" /><p className="mt-3 text-sm font-bold">Desbloquea más alcance</p><p className="mt-1 text-xs leading-relaxed text-white/50">Conoce mejor a tu audiencia y crece más rápido.</p><button type="button" onClick={() => selectTab('Suscripciones')} className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-amber">Ver planes <ArrowUpRight className="size-3" /></button></div>
+        </aside>
+        {mobileNavOpen && <button type="button" onClick={() => setMobileNavOpen(false)} className="fixed inset-0 z-20 bg-black/60 lg:hidden" aria-label="Cerrar menu" />}
+        <main className="min-w-0 flex-1 px-5 py-5 sm:px-8 lg:px-12 lg:py-7">
+          <header className="flex items-center justify-between border-b border-white/10 pb-5"><button type="button" onClick={() => setMobileNavOpen(true)} className="text-white/70 lg:hidden" aria-label="Abrir menu"><Menu className="size-6" /></button><div className="hidden lg:block"><p className="text-sm text-white/45">Domingo, 23 de agosto</p><h1 className="mt-1 font-display text-2xl font-extrabold">Hola, fckn.daybeat <Sparkles className="ml-1 inline size-5 text-amber" /></h1></div><div className="ml-auto flex items-center gap-3"><button type="button" className="relative flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white" aria-label="Notificaciones"><Bell className="size-4" /><span className="absolute right-2 top-2 size-1.5 rounded-full bg-neon" /></button><div className="relative"><button type="button" onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-1.5 pr-3 hover:border-neon/40" aria-expanded={profileOpen} aria-label="Abrir perfil"><img src={PROFILE.avatar} alt="" className="size-7 rounded-lg object-cover" /><span className="hidden text-sm font-semibold sm:block">Creador</span><ChevronDown className="size-3.5 text-white/45" /></button>{profileOpen && <div className="absolute right-0 top-12 z-40 w-44 rounded-xl border border-white/10 bg-plum p-2 shadow-2xl"><button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-white/75 hover:bg-white/10"><UserRound className="size-4" /> Mi perfil</button><button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-white/75 hover:bg-white/10"><Settings className="size-4" /> Ajustes</button></div>}</div></div></header>
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mx-auto max-w-6xl pt-8"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold text-neon-soft">Resumen de rendimiento</p><h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Tu contenido está <span className="text-amber">creciendo.</span></h2><p className="mt-2 text-sm text-white/45">Mira cómo está funcionando tu link en bio esta semana.</p></div><a href={PROFILE.featured} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-ink transition hover:bg-amber"><ExternalLink className="size-4" /> Ver mi página</a></div>
+            <section className="mt-8 grid gap-4 md:grid-cols-3">{STATS.map(({ label, value, change, icon: Icon, color }) => <div key={label} className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm"><div className="flex items-center justify-between"><span className="flex size-9 items-center justify-center rounded-lg bg-white/5"><Icon className={`size-4 ${color}`} /></span><span className="flex items-center gap-1 text-xs font-bold text-emerald-300"><TrendingUp className="size-3" /> {change}</span></div><p className="mt-5 text-sm text-white/45">{label}</p><p className="mt-1 font-display text-3xl font-extrabold">{value}</p></div>)}</section>
+            <section className="mt-4 grid gap-4 xl:grid-cols-[1.45fr_1fr]"><div className="rounded-2xl border border-white/10 bg-plum/55 p-5 sm:p-6"><div className="flex items-start justify-between"><div><h3 className="font-display text-lg font-bold">Actividad</h3><p className="mt-1 text-xs text-white/40">Visitas a tu página · últimos 7 días</p></div><button type="button" className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white/60 hover:text-white">Esta semana <ChevronDown className="ml-1 inline size-3" /></button></div><div className="mt-8 flex h-48 items-end gap-2 sm:gap-4">{[38, 54, 48, 72, 64, 86, 100].map((height, index) => <div key={index} className="flex flex-1 flex-col items-center gap-3"><div className={`w-full rounded-t-lg ${index === 6 ? 'bg-gradient-to-t from-neon to-neon-soft shadow-[0_0_22px_-5px_rgba(244,114,182,0.8)]' : 'bg-white/10'}`} style={{ height: `${height}%` }} /><span className="text-[10px] text-white/35">{['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Hoy'][index]}</span></div>)}</div></div><div className="rounded-2xl border border-white/10 bg-plum/55 p-5 sm:p-6"><div className="flex items-center justify-between"><div><h3 className="font-display text-lg font-bold">Enlaces top</h3><p className="mt-1 text-xs text-white/40">Los que más conectan</p></div><button type="button" className="flex size-8 items-center justify-center rounded-lg bg-white/5 text-white/60 hover:text-white" aria-label="Agregar enlace"><Plus className="size-4" /></button></div><div className="mt-6 space-y-5">{TOP_LINKS.map((link) => <div key={link.name}><div className="mb-2 flex justify-between text-sm"><span className="font-semibold">{link.name}</span><span className="text-white/45">{link.clicks}</span></div><div className="h-2 rounded-full bg-white/10"><div className={`h-full rounded-full ${link.color}`} style={{ width: `${link.percent}%` }} /></div></div>)}</div><button type="button" onClick={() => selectTab('Personalizacion')} className="mt-8 w-full rounded-xl border border-white/10 py-3 text-xs font-bold text-white/60 transition hover:border-neon/50 hover:text-white">Gestionar enlaces <ArrowUpRight className="ml-1 inline size-3" /></button></div></section>
+            <section className="mt-4 flex flex-col gap-4 rounded-2xl border border-neon/20 bg-gradient-to-r from-neon/15 via-plum/65 to-amber/10 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber text-ink"><Check className="size-5" /></span><div><h3 className="font-display font-bold">Tu perfil está listo para compartir</h3><p className="mt-1 text-sm text-white/50">Todo se ve bien. Sigue agregando contenido para mantener a tu comunidad cerca.</p></div></div><button type="button" onClick={() => selectTab('Personalizacion')} className="whitespace-nowrap rounded-xl bg-white px-4 py-3 text-sm font-bold text-ink hover:bg-amber">Editar perfil</button></section>
+          </motion.div>
+        </main>
+      </div>
     </div>
   )
+}
+
+function NavButton({ active, icon: Icon, onClick, children }: { active: boolean; icon: typeof LayoutDashboard; onClick: () => void; children: string }) {
+  return <button type="button" onClick={onClick} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${active ? 'bg-neon/15 text-neon-soft ring-1 ring-neon/25' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}><Icon className="size-4" /> {children}</button>
 }
 
 function BackgroundFx() {
@@ -165,26 +95,5 @@ function BackgroundFx() {
   )
 }
 
-function YouTubeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-6 fill-current" aria-hidden>
-      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.75 15.5v-7l6.2 3.5-6.2 3.5Z" />
-    </svg>
-  )
-}
 
-function TikTokIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-6 fill-current" aria-hidden>
-      <path d="M19.6 7.4a6.5 6.5 0 0 1-3.8-1.2v8.1a5.7 5.7 0 1 1-5.7-5.7c.3 0 .6 0 .9.1v2.8a2.9 2.9 0 1 0 2 2.8V2h2.8a6.5 6.5 0 0 0 3.8 3.6v1.8Z" />
-    </svg>
-  )
-}
 
-function InstagramIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-6 fill-current" aria-hidden>
-      <path d="M12 7.2A4.8 4.8 0 1 0 12 16.8 4.8 4.8 0 0 0 12 7.2Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Zm6.3-8.2a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0ZM21.5 8.1a6.5 6.5 0 0 0-1.8-4.6 6.5 6.5 0 0 0-4.6-1.8c-1.8-.1-7.3-.1-9.1 0a6.5 6.5 0 0 0-4.6 1.8 6.5 6.5 0 0 0-1.8 4.6c-.1 1.8-.1 7.3 0 9.1a6.5 6.5 0 0 0 1.8 4.6 6.5 6.5 0 0 0 4.6 1.8c1.8.1 7.3.1 9.1 0a6.5 6.5 0 0 0 4.6-1.8 6.5 6.5 0 0 0 1.8-4.6c.1-1.8.1-7.3 0-9.1Zm-2.3 11a3.8 3.8 0 0 1-2.1 2.1c-1.5.6-5 .5-6.6.5s-5.1.1-6.6-.5a3.8 3.8 0 0 1-2.1-2.1c-.6-1.5-.5-5-.5-6.6s-.1-5.1.5-6.6a3.8 3.8 0 0 1 2.1-2.1c1.5-.6 5-.5 6.6-.5s5.1-.1 6.6.5a3.8 3.8 0 0 1 2.1 2.1c.6 1.5.5 5 .5 6.6s.1 5.1-.5 6.6Z" />
-    </svg>
-  )
-}
