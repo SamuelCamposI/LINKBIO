@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, BookOpen, Camera, Link2 } from 'lucide-react'
+import { ArrowUpRight, BookOpen, Camera } from 'lucide-react'
 
 const PROFILE_LINKS = [
     { label: 'YouTube', href: 'https://www.youtube.com', icon: 'youtube' },
