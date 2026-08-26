@@ -1,14 +1,19 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, BookOpen, Camera } from 'lucide-react'
-
-const PROFILE_LINKS = [
-    { label: 'YouTube', href: 'https://www.youtube.com', icon: 'youtube' },
-    { label: 'TikTok', href: 'https://www.tiktok.com', icon: 'tiktok' },
-    { label: 'Instagram', href: 'https://www.instagram.com', icon: 'instagram' },
-    { label: 'Blog personal', href: 'https://www.google.com', icon: 'blog' },
-]
+import { ArrowUpRight } from 'lucide-react'
+import { FaDiscord, FaFacebook, FaGithub, FaGlobe, FaInstagram, FaLink, FaLinkedin, FaMusic, FaTelegram, FaTiktok, FaTwitch, FaWhatsapp, FaYoutube } from 'react-icons/fa6'
+import { SiSpotify, SiX } from 'react-icons/si'
+import { useEffect, useState } from 'react'
+import { loadProfile, type ProfileConfig, type ProfileIcon } from './profileConfig'
 
 export default function PublicProfile() {
+    const [profile, setProfile] = useState<ProfileConfig>(() => loadProfile())
+
+    useEffect(() => {
+        const refreshProfile = () => setProfile(loadProfile())
+        window.addEventListener('storage', refreshProfile)
+        return () => window.removeEventListener('storage', refreshProfile)
+    }, [])
+
     return (
         <div className="relative min-h-dvh overflow-hidden bg-void text-white">
             <PublicBackground />
@@ -20,10 +25,10 @@ export default function PublicProfile() {
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 >
                     <div className="avatar-glow rounded-full p-[3px]">
-                        <img src="/avatar.png" alt="fckn.daybeat" width={150} height={150} className="size-32 rounded-full object-cover sm:size-36" draggable={false} />
+                        <img src={profile.avatar} alt={profile.displayName} width={150} height={150} className="size-32 rounded-full object-cover sm:size-36" draggable={false} />
                     </div>
-                    <h1 className="mt-6 font-display text-[2.4rem] font-extrabold leading-none tracking-[-0.06em] text-amber sm:text-5xl">fckn.daybeat</h1>
-                    <p className="mt-4 text-base font-semibold text-white/55 sm:text-lg">Contenido, ritmo y vibes diarias</p>
+                    <h1 className="mt-6 font-display text-[2.4rem] font-extrabold leading-none tracking-[-0.06em] sm:text-5xl" style={{ color: profile.accent }}>{profile.displayName}</h1>
+                    <p className="mt-4 text-base font-semibold text-white/55 sm:text-lg">{profile.bio}</p>
                 </motion.header>
 
                 <motion.nav
@@ -33,18 +38,18 @@ export default function PublicProfile() {
                     variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } } }}
                     aria-label="Enlaces públicos"
                 >
-                    {PROFILE_LINKS.map((link) => (
+                    {profile.links.map((link) => (
                         <motion.a
                             key={link.label}
                             href={link.href}
                             target="_blank"
                             rel="noopener noreferrer"
                             variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-                            className="group flex min-h-28 items-center gap-5 rounded-[2rem] border border-neon/40 bg-plum/60 px-6 backdrop-blur-md transition hover:-translate-y-1 hover:border-neon hover:bg-plum/85 hover:shadow-[0_0_32px_-10px_rgba(236,72,153,0.8)] sm:px-7"
+                            className={`group flex min-h-28 items-center gap-5 rounded-[2rem] px-6 backdrop-blur-md transition hover:-translate-y-1 sm:px-7 ${profile.buttonStyle === 'soft' ? 'border border-white/15 bg-plum/60' : 'border border-white/35 bg-transparent'}`}
                         >
-                            <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-amber/40 bg-midnight/75 text-amber transition group-hover:border-amber group-hover:text-amber-hot">{getIcon(link.icon)}</span>
+                            <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-midnight/75 transition" style={{ color: profile.accent, borderColor: `${profile.accent}66` }}>{getIcon(link.icon)}</span>
                             <span className="flex-1 text-left text-lg font-extrabold tracking-wide sm:text-xl">{link.label}</span>
-                            <ArrowUpRight className="size-6 text-amber transition group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={2.5} />
+                            <ArrowUpRight className="size-6 transition group-hover:-translate-y-1 group-hover:translate-x-1" style={{ color: profile.accent }} strokeWidth={2.5} />
                         </motion.a>
                     ))}
                 </motion.nav>
@@ -57,11 +62,10 @@ export default function PublicProfile() {
     )
 }
 
-function getIcon(icon: string) {
-    if (icon === 'blog') return <BookOpen className="size-8" strokeWidth={2} />
-    if (icon === 'instagram') return <Camera className="size-8" strokeWidth={2} />
-    if (icon === 'youtube') return <span className="text-2xl font-black">▶</span>
-    return <span className="text-3xl font-bold">♪</span>
+function getIcon(icon: ProfileIcon) {
+    const icons = { youtube: FaYoutube, tiktok: FaTiktok, instagram: FaInstagram, facebook: FaFacebook, x: SiX, linkedin: FaLinkedin, spotify: SiSpotify, twitch: FaTwitch, github: FaGithub, discord: FaDiscord, whatsapp: FaWhatsapp, telegram: FaTelegram, blog: FaGlobe, music: FaMusic, globe: FaGlobe, link: FaLink }
+    const Icon = icons[icon]
+    return <Icon className="size-8" />
 }
 
 function PublicBackground() {
