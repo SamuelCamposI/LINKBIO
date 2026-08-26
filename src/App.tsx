@@ -16,10 +16,14 @@ import {
   Settings,
   Sparkles,
   TrendingUp,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { loadProfile, saveProfile, type ProfileConfig, type ProfileIcon } from './profileConfig'
+import { FaDiscord, FaFacebook, FaGithub, FaGlobe, FaInstagram, FaLink, FaLinkedin, FaMusic, FaTelegram, FaTiktok, FaTwitch, FaWhatsapp, FaYoutube } from 'react-icons/fa6'
+import { SiSpotify, SiX } from 'react-icons/si'
 
 const PROFILE = {
   name: 'fckn.daybeat',
@@ -55,6 +59,8 @@ export default function App() {
     setMobileNavOpen(false)
   }
 
+  if (activeTab === 'Personalizacion') return <LinksCustomizationPanel onBack={() => setActiveTab('Inicio')} />
+
   return (
     <div className="relative min-h-dvh overflow-hidden bg-midnight text-white">
       <BackgroundFx />
@@ -77,6 +83,107 @@ export default function App() {
       </div>
     </div>
   )
+}
+
+export function CustomizationPanel({ onBack }: { onBack: () => void }) {
+  const [displayName, setDisplayName] = useState('fckn.daybeat')
+  const [bio, setBio] = useState('Contenido, ritmo y vibes diarias')
+  const [accent, setAccent] = useState('#ec4899')
+  const [buttonStyle, setButtonStyle] = useState<'soft' | 'outline'>('soft')
+
+  return (
+    <div className="relative min-h-dvh overflow-hidden bg-midnight text-white">
+      <BackgroundFx />
+      <main className="relative z-10 mx-auto max-w-6xl px-5 py-6 sm:px-8 lg:px-12 lg:py-8">
+        <header className="flex items-center justify-between border-b border-white/10 pb-5">
+          <div><p className="text-sm font-semibold text-neon-soft">Personalización</p><h1 className="mt-1 font-display text-2xl font-extrabold">Diseña tu página</h1></div>
+          <button type="button" onClick={onBack} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 hover:text-white">Volver al resumen</button>
+        </header>
+        <div className="grid gap-6 pt-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7">
+            <div className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-xl bg-neon/15 text-neon-soft"><Palette className="size-5" /></span><div><h2 className="font-display text-lg font-bold">Identidad del perfil</h2><p className="text-sm text-white/45">Haz que tu primera impresión se sienta tuya.</p></div></div>
+            <div className="mt-8 space-y-6">
+              <label className="block"><span className="mb-2 block text-sm font-semibold text-white/70">Nombre visible</span><input value={displayName} onChange={(event) => setDisplayName(event.target.value)} className="w-full rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none transition focus:border-neon" /></label>
+              <label className="block"><span className="mb-2 block text-sm font-semibold text-white/70">Descripción</span><textarea value={bio} onChange={(event) => setBio(event.target.value)} rows={3} className="w-full resize-none rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none transition focus:border-neon" /></label>
+              <div><span className="mb-3 block text-sm font-semibold text-white/70">Color de acento</span><div className="flex flex-wrap gap-3">{['#ec4899', '#fbbf24', '#38bdf8', '#a78bfa'].map((color) => <button key={color} type="button" onClick={() => setAccent(color)} aria-label={`Elegir color ${color}`} className={`size-9 rounded-full border-2 transition ${accent === color ? 'scale-110 border-white' : 'border-transparent'}`} style={{ backgroundColor: color }} />)}</div></div>
+              <div><span className="mb-3 block text-sm font-semibold text-white/70">Estilo de enlaces</span><div className="grid grid-cols-2 gap-3">{(['soft', 'outline'] as const).map((style) => <button key={style} type="button" onClick={() => setButtonStyle(style)} className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${buttonStyle === style ? 'border-neon bg-neon/15 text-white' : 'border-white/10 bg-white/5 text-white/50 hover:text-white'}`}>{style === 'soft' ? 'Suave' : 'Contorno'}</button>)}</div></div>
+            </div>
+          </section>
+          <section className="lg:sticky lg:top-8 lg:self-start"><div className="mb-3 flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Vista previa</h2><p className="text-sm text-white/45">Así lo verá tu audiencia.</p></div><span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-300"><span className="size-1.5 rounded-full bg-emerald-300" /> En vivo</span></div><div className="mx-auto max-w-sm rounded-[2rem] border border-white/10 bg-void p-4 shadow-2xl"><div className="rounded-[1.5rem] px-4 py-10 text-center" style={{ background: `radial-gradient(circle at 50% 10%, ${accent}55, #18042d 44%, #070014 90%)` }}><img src="/avatar.png" alt="" className="mx-auto size-20 rounded-full object-cover ring-4 ring-white/20" /><h3 className="mt-5 font-display text-2xl font-extrabold" style={{ color: accent }}>{displayName || 'Tu nombre'}</h3><p className="mt-2 text-sm text-white/65">{bio || 'Añade una descripción'}</p><div className="mt-7 space-y-3">{['YouTube', 'TikTok', 'Instagram'].map((link) => <div key={link} className={`rounded-xl px-4 py-3 text-sm font-bold ${buttonStyle === 'soft' ? 'bg-white/10' : 'border border-white/25'}`}>{link}</div>)}</div></div></div></section>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export function AdvancedCustomizationPanel({ onBack }: { onBack: () => void }) {
+  const [profile, setProfile] = useState<ProfileConfig>(() => loadProfile())
+  const updateProfile = (changes: Partial<ProfileConfig>) => {
+    setProfile((current) => {
+      const next = { ...current, ...changes }
+      saveProfile(next)
+      return next
+    })
+  }
+  const updateLink = (id: string, changes: Partial<ProfileConfig['links'][number]>) => updateProfile({ links: profile.links.map((link) => link.id === id ? { ...link, ...changes } : link) })
+  const addLink = () => updateProfile({ links: [...profile.links, { id: `${Date.now()}`, label: 'Nuevo enlace', href: 'https://', icon: 'link' }] })
+  const removeLink = (id: string) => updateProfile({ links: profile.links.filter((link) => link.id !== id) })
+
+  const handleAvatar = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => updateProfile({ avatar: String(reader.result) })
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <div className="relative min-h-dvh overflow-hidden bg-midnight text-white">
+      <BackgroundFx />
+      <main className="relative z-10 mx-auto max-w-6xl px-5 py-6 sm:px-8 lg:px-12 lg:py-8">
+        <header className="flex items-center justify-between border-b border-white/10 pb-5"><div><p className="text-sm font-semibold text-neon-soft">Personalización</p><h1 className="mt-1 font-display text-2xl font-extrabold">Construye tu página</h1></div><button type="button" onClick={onBack} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 hover:text-white">Volver al resumen</button></header>
+        <div className="grid gap-6 pt-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="space-y-6">
+            <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><div className="flex items-center gap-4"><img src={profile.avatar} alt="" className="size-16 rounded-2xl object-cover" /><div><h2 className="font-display text-lg font-bold">Foto de perfil</h2><p className="text-sm text-white/45">Usa una imagen cuadrada para obtener el mejor resultado.</p></div><label className="ml-auto cursor-pointer rounded-xl bg-white px-3 py-2 text-xs font-bold text-ink hover:bg-amber">Cambiar<input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleAvatar} className="sr-only" /></label></div></section>
+            <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><h2 className="font-display text-lg font-bold">Información pública</h2><div className="mt-5 grid gap-5 sm:grid-cols-2"><label><span className="mb-2 block text-sm font-semibold text-white/70">Nombre visible</span><input value={profile.displayName} onChange={(event) => updateProfile({ displayName: event.target.value })} className="w-full rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none focus:border-neon" /></label><label><span className="mb-2 block text-sm font-semibold text-white/70">Descripción</span><input value={profile.bio} onChange={(event) => updateProfile({ bio: event.target.value })} className="w-full rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none focus:border-neon" /></label></div><div className="mt-6"><span className="mb-3 block text-sm font-semibold text-white/70">Color de acento</span><div className="flex gap-3">{['#ec4899', '#fbbf24', '#38bdf8', '#a78bfa'].map((color) => <button key={color} type="button" onClick={() => updateProfile({ accent: color })} aria-label={`Elegir color ${color}`} className={`size-9 rounded-full border-2 ${profile.accent === color ? 'scale-110 border-white' : 'border-transparent'}`} style={{ backgroundColor: color }} />)}</div></div></section>
+            <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Tus enlaces</h2><p className="text-sm text-white/45">Añade hasta 6 destinos y elige su icono.</p></div><span className="text-xs font-bold text-white/45">{profile.links.length}/6</span></div><div className="mt-5 space-y-3">{profile.links.map((link) => <div key={link.id} className="grid gap-3 rounded-xl border border-white/10 bg-void/35 p-3 sm:grid-cols-[44px_minmax(0,1fr)_minmax(0,1fr)_180px_36px]"><div className="flex size-11 items-center justify-center rounded-lg bg-white/10 text-lg" title={`Icono: ${link.icon}`}>{iconGlyph(link.icon)}</div><input aria-label="Nombre del enlace" value={link.label} onChange={(event) => updateLink(link.id, { label: event.target.value })} className="rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm outline-none focus:border-neon" /><input aria-label="URL del enlace" value={link.href} onChange={(event) => updateLink(link.id, { href: event.target.value })} className="rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm outline-none focus:border-neon" /><select aria-label="Icono del enlace" value={link.icon} onChange={(event) => updateLink(link.id, { icon: event.target.value as ProfileIcon })} className="rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm text-white outline-none focus:border-neon"><optgroup label="Redes sociales"><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="x">X</option><option value="linkedin">LinkedIn</option><option value="twitch">Twitch</option></optgroup><optgroup label="Comunidades"><option value="discord">Discord</option><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option></optgroup><optgroup label="Contenido y web"><option value="spotify">Spotify</option><option value="github">GitHub</option><option value="blog">Blog</option><option value="music">Música</option><option value="globe">Sitio web</option><option value="link">Enlace</option></optgroup></select><button type="button" onClick={() => removeLink(link.id)} aria-label={`Eliminar ${link.label}`} className="flex size-9 items-center justify-center rounded-lg text-white/40 hover:bg-red-400/10 hover:text-red-300"><Trash2 className="size-4" /></button></div>)}</div><button type="button" disabled={profile.links.length >= 6} onClick={addLink} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-neon/30 px-4 py-2.5 text-sm font-bold text-neon-soft enabled:hover:bg-neon/10 disabled:cursor-not-allowed disabled:opacity-35"><Plus className="size-4" /> Agregar enlace</button></section>
+          </div>
+          <section className="lg:sticky lg:top-8 lg:self-start"><div className="mb-3 flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Vista previa</h2><p className="text-sm text-white/45">Se actualiza automáticamente.</p></div><span className="text-xs font-semibold text-emerald-300">En vivo</span></div><div className="mx-auto max-w-sm rounded-[2rem] border border-white/10 bg-void p-4 shadow-2xl"><div className="rounded-[1.5rem] px-4 py-9 text-center" style={{ background: `radial-gradient(circle at 50% 10%, ${profile.accent}55, #18042d 44%, #070014 90%)` }}><img src={profile.avatar} alt="" className="mx-auto size-20 rounded-full object-cover ring-4 ring-white/20" /><h3 className="mt-5 font-display text-2xl font-extrabold" style={{ color: profile.accent }}>{profile.displayName || 'Tu nombre'}</h3><p className="mt-2 text-sm text-white/65">{profile.bio || 'Añade una descripción'}</p><div className="mt-7 space-y-3">{profile.links.map((link) => <div key={link.id} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold ${profile.buttonStyle === 'soft' ? 'bg-white/10' : 'border border-white/25'}`}><span className="text-base">{iconGlyph(link.icon)}</span>{link.label}</div>)}</div></div></div></section>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function LinksCustomizationPanel({ onBack }: { onBack: () => void }) {
+  const [profile, setProfile] = useState<ProfileConfig>(() => loadProfile())
+  const updateProfile = (changes: Partial<ProfileConfig>) => setProfile((current) => { const next = { ...current, ...changes }; saveProfile(next); return next })
+  const updateLink = (id: string, changes: Partial<ProfileConfig['links'][number]>) => updateProfile({ links: profile.links.map((link) => link.id === id ? { ...link, ...changes } : link) })
+  const addLink = () => updateProfile({ links: [...profile.links, { id: `${Date.now()}`, label: 'Nuevo enlace', href: 'https://', icon: 'link' }] })
+  const removeLink = (id: string) => updateProfile({ links: profile.links.filter((link) => link.id !== id) })
+  const handleAvatar = (event: React.ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => updateProfile({ avatar: String(reader.result) }); reader.readAsDataURL(file) }
+
+  return (
+    <div className="relative min-h-dvh overflow-hidden bg-midnight text-white">
+      <BackgroundFx />
+      <main className="relative z-10 mx-auto max-w-6xl px-5 py-6 sm:px-8 lg:px-12 lg:py-8">
+        <header className="flex items-center justify-between border-b border-white/10 pb-5"><div><p className="text-sm font-semibold text-neon-soft">Personalización</p><h1 className="mt-1 font-display text-2xl font-extrabold">Construye tu página</h1></div><button type="button" onClick={onBack} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 hover:text-white">Volver al resumen</button></header>
+        <div className="grid gap-6 pt-8 lg:grid-cols-[minmax(0,1fr)_360px]"><div className="customization-sections space-y-6">
+          <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><h2 className="font-display text-lg font-bold">Color de los enlaces</h2><p className="mt-1 text-sm text-white/45">Elige el color que identificará tus botones y enlaces.</p><div className="mt-5 flex flex-wrap gap-3">{['#ec4899', '#fbbf24', '#38bdf8', '#a78bfa', '#34d399', '#fb7185'].map((color) => <button key={color} type="button" onClick={() => updateProfile({ accent: color })} aria-label={`Elegir color ${color}`} className={`size-10 rounded-full border-2 transition hover:scale-110 ${profile.accent === color ? 'scale-110 border-white shadow-[0_0_18px_-3px_currentColor]' : 'border-transparent'}`} style={{ backgroundColor: color, color }} />)}</div></section>
+          <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><div className="flex items-center gap-4"><img src={profile.avatar} alt="" className="size-16 rounded-2xl object-cover" /><div><h2 className="font-display text-lg font-bold">Foto de perfil</h2><p className="text-sm text-white/45">Configura la imagen que verá tu audiencia.</p></div><label className="ml-auto cursor-pointer rounded-xl bg-white px-3 py-2 text-xs font-bold text-ink hover:bg-amber">Cambiar<input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleAvatar} className="sr-only" /></label></div></section>
+          <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><h2 className="font-display text-lg font-bold">Información pública</h2><div className="mt-5 grid gap-5 sm:grid-cols-2"><label><span className="mb-2 block text-sm font-semibold text-white/70">Nombre visible</span><input value={profile.displayName} onChange={(event) => updateProfile({ displayName: event.target.value })} className="w-full rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none focus:border-neon" /></label><label><span className="mb-2 block text-sm font-semibold text-white/70">Descripción</span><input value={profile.bio} onChange={(event) => updateProfile({ bio: event.target.value })} className="w-full rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm outline-none focus:border-neon" /></label></div></section>
+          <section className="rounded-2xl border border-white/10 bg-plum/55 p-5 backdrop-blur-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Tus enlaces</h2><p className="text-sm text-white/45">Añade hasta 6 destinos y elige su icono.</p></div><span className="text-xs font-bold text-white/45">{profile.links.length}/6</span></div><div className="mt-5 hidden grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_44px_36px] gap-3 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white/40 sm:grid"><span>Título del enlace</span><span>Link de destino</span><span>Seleccionar icono</span><span>Icono</span><span aria-hidden="true" /></div><div className="mt-2 space-y-3">{profile.links.map((link) => <div key={link.id} className="grid gap-3 rounded-xl border border-white/10 bg-void/35 p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_44px_36px]"><input aria-label="Título del enlace" value={link.label} onChange={(event) => updateLink(link.id, { label: event.target.value })} className="order-1 rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm outline-none focus:border-neon" /><input aria-label="Link de destino" value={link.href} onChange={(event) => updateLink(link.id, { href: event.target.value })} className="order-2 rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm outline-none focus:border-neon" /><select aria-label="Seleccionar icono" value={link.icon} onChange={(event) => updateLink(link.id, { icon: event.target.value as ProfileIcon })} className="order-3 rounded-lg border border-white/10 bg-void/60 px-3 py-2 text-sm text-white outline-none focus:border-neon"><optgroup label="Redes sociales"><option value="youtube">YouTube</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="x">X</option><option value="linkedin">LinkedIn</option><option value="twitch">Twitch</option></optgroup><optgroup label="Comunidades"><option value="discord">Discord</option><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option></optgroup><optgroup label="Contenido y web"><option value="spotify">Spotify</option><option value="github">GitHub</option><option value="blog">Blog</option><option value="music">Música</option><option value="globe">Sitio web</option><option value="link">Enlace</option></optgroup></select><div className="order-4 flex size-11 items-center justify-center rounded-lg bg-white/10 text-lg" title={`Icono seleccionado: ${link.icon}`}>{iconGlyph(link.icon)}</div><button type="button" onClick={() => removeLink(link.id)} aria-label={`Eliminar ${link.label}`} className="order-5 flex size-9 items-center justify-center self-center rounded-lg text-red-400 hover:bg-red-400/15 hover:text-red-300"><Trash2 className="size-4" /></button></div>)}</div><button type="button" disabled={profile.links.length >= 6} onClick={addLink} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-neon/30 px-4 py-2.5 text-sm font-bold text-neon-soft enabled:hover:bg-neon/10 disabled:cursor-not-allowed disabled:opacity-35"><Plus className="size-4" /> Agregar enlace</button> <div className="fixed bottom-6 right-5 z-30 sm:right-8 lg:right-[max(3rem,calc((100vw-72rem)/2+3rem))]"><button type="button" onClick={() => { saveProfile(profile); onBack() }} className="inline-flex items-center justify-center rounded-xl bg-amber px-7 py-3 text-sm font-extrabold text-ink shadow-[0_8px_30px_-8px_rgba(251,191,36,0.8)] transition hover:bg-amber-hot">Guardar</button></div></section>
+        </div><section className="lg:sticky lg:top-8 lg:self-start"><h2 className="mb-3 font-display text-lg font-bold">Vista previa</h2><div className="mx-auto max-w-sm rounded-[2rem] border border-white/10 bg-void p-4 shadow-2xl"><div className="rounded-[1.5rem] px-4 py-9 text-center" style={{ background: `radial-gradient(circle at 50% 10%, ${profile.accent}55, #18042d 44%, #070014 90%)` }}><img src={profile.avatar} alt="" className="mx-auto size-20 rounded-full object-cover ring-4 ring-white/20" /><h3 className="mt-5 font-display text-2xl font-extrabold" style={{ color: profile.accent }}>{profile.displayName}</h3><p className="mt-2 text-sm text-white/65">{profile.bio}</p><div className="mt-7 space-y-3">{profile.links.map((link) => <div key={link.id} className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 text-left text-sm font-bold"><span>{iconGlyph(link.icon)}</span>{link.label}</div>)}</div></div></div></section></div>
+
+      </main>
+    </div>
+  )
+}
+
+function iconGlyph(icon: ProfileIcon) {
+  const icons = { youtube: FaYoutube, tiktok: FaTiktok, instagram: FaInstagram, facebook: FaFacebook, x: SiX, linkedin: FaLinkedin, spotify: SiSpotify, twitch: FaTwitch, github: FaGithub, discord: FaDiscord, whatsapp: FaWhatsapp, telegram: FaTelegram, blog: FaGlobe, music: FaMusic, globe: FaGlobe, link: FaLink }
+  const Icon = icons[icon]
+  return <Icon className="size-5" />
 }
 
 function NavButton({ active, icon: Icon, onClick, children }: { active: boolean; icon: typeof LayoutDashboard; onClick: () => void; children: string }) {
