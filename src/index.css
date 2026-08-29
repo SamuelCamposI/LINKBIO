@@ -130,10 +130,12 @@ body {
 }
 
 /* =========================================================
-   LOGIN — estilos que agregué para la sección de login
+   LOGIN — estilos de la sección de auth
    - Pantalla completa sin scroll
-   - Animación flotante del iPhone y tarjetas
-   - Toggle "Recordar sesión" (Uiverse, colores del brand)
+   - iPhone + chips flotando
+   - Toggle "Recordar sesión"
+   - Scrollbar del date picker custom
+   - Barrita de fuerza de contraseña
    ========================================================= */
 
 /* Evita scroll y fuerza viewport completo en el login */
@@ -143,77 +145,293 @@ body {
   max-height: 100dvh;
   max-width: 100dvw;
   overflow: hidden;
+  /* Escala iPhone + tipografía según pantalla */
+  --login-phone-scale: clamp(0.7, 0.48 + 0.45 * (100vh / 1000px), 1.15);
+  --login-stage-gap: clamp(0.65rem, 2vh, 1.5rem);
+  --login-copy-gap: clamp(0.85rem, 2.4vh, 1.75rem);
+  --login-title-size: clamp(1.45rem, 1.15rem + 0.85vw, 2.2rem);
+  --login-sub-size: clamp(0.8rem, 0.72rem + 0.22vw, 0.95rem);
+  /* Densidad del formulario (auth) — se comprime en pantallas bajas */
+  --login-input-h: 2.75rem;
+  --login-form-gap: 0.875rem;
+  --login-field-gap: 0.75rem;
+  --login-label-mb: 0.375rem;
+  --login-header-mb: 1.5rem;
+  --login-brand-mb: 1rem;
+  --login-stepper-mb: 1.5rem;
+  --login-footer-mt: 1.25rem;
+  --login-footer-gap: 0.875rem;
+  --login-panel-py: 2rem;
+  --login-auth-title-size: 1.5rem;
+  --login-auth-sub-size: 0.875rem;
 }
 
-/* Movimiento suave arriba/abajo (alternate = no se traba al reiniciar) */
+/* Panel derecho: densifica para caber; scroll solo si no alcanza */
+.login-panel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-block: var(--login-panel-py);
+}
+
+.login-auth-header {
+  margin-bottom: var(--login-header-mb);
+}
+
+.login-auth-brand {
+  margin-bottom: var(--login-brand-mb);
+}
+
+.login-auth-title {
+  font-size: var(--login-auth-title-size);
+  line-height: 1.15;
+}
+
+.login-auth-sub {
+  margin-top: 0.25rem;
+  font-size: var(--login-auth-sub-size);
+}
+
+.login-auth-stepper {
+  margin-bottom: var(--login-stepper-mb);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--login-form-gap);
+}
+
+.login-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--login-field-gap);
+}
+
+.login-btn {
+  height: var(--login-input-h);
+}
+
+.login-auth-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--login-footer-gap);
+  margin-top: var(--login-footer-mt);
+}
+
+/* Labels un poco más juntos al input */
+.login-panel label > span.block,
+.login-panel .login-label {
+  margin-bottom: var(--login-label-mb);
+}
+
+/* Laptops / altura media: compacta un poco, sin pegar los elementos */
+@media (max-height: 900px) {
+  .login-screen {
+    --login-input-h: 2.5rem;
+    --login-form-gap: 0.7rem;
+    --login-field-gap: 0.6rem;
+    --login-label-mb: 0.3rem;
+    --login-header-mb: 0.9rem;
+    --login-brand-mb: 0.55rem;
+    --login-stepper-mb: 0.85rem;
+    --login-footer-mt: 0.85rem;
+    --login-footer-gap: 0.65rem;
+    --login-panel-py: 1rem;
+    --login-auth-title-size: 1.35rem;
+    --login-auth-sub-size: 0.82rem;
+  }
+
+  .login-auth-brand .size-11 {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .login-auth-brand .font-display {
+    font-size: 1.1rem;
+  }
+
+  .login-auth-stepper [class*='size-8'] {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+}
+
+/* Pantallas bajas de PC: un poco más compacto, con aire */
+@media (max-height: 800px) {
+  .login-screen {
+    --login-input-h: 2.35rem;
+    --login-form-gap: 0.55rem;
+    --login-field-gap: 0.5rem;
+    --login-header-mb: 0.7rem;
+    --login-brand-mb: 0.45rem;
+    --login-stepper-mb: 0.65rem;
+    --login-footer-mt: 0.65rem;
+    --login-footer-gap: 0.5rem;
+    --login-panel-py: 0.75rem;
+    --login-auth-title-size: 1.25rem;
+    --login-auth-sub-size: 0.78rem;
+  }
+
+  .login-auth-hint {
+    margin-top: 0.2rem;
+    line-height: 1.3;
+  }
+
+  .login-otp {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .login-screen {
+    --login-input-h: 2.25rem;
+    --login-form-gap: 0.45rem;
+    --login-field-gap: 0.4rem;
+    --login-auth-title-size: 1.15rem;
+    --login-panel-py: 0.55rem;
+  }
+}
+
+/* Columna visual: logo | iPhone | texto con márgenes claros */
+.login-visual {
+  gap: var(--login-stage-gap);
+}
+
+.login-visual-stage {
+  margin-block: clamp(0.15rem, 0.8vh, 0.6rem);
+  min-height: clamp(13rem, 36vh, 30rem);
+}
+
+.login-hero-copy {
+  margin-top: var(--login-copy-gap);
+}
+
+.login-hero-copy h2 {
+  font-size: var(--login-title-size);
+}
+
+.login-hero-sub {
+  font-size: var(--login-sub-size);
+  line-height: 1.45;
+}
+
+.login-showcase {
+  min-height: clamp(13rem, 34vh, 28rem);
+}
+
+.login-iphone-scale {
+  transform: scale(var(--login-phone-scale));
+  transform-origin: center center;
+}
+
+/* Laptops / altura baja: más compacto, más aire entre phone y texto */
+@media (max-height: 800px) {
+  .login-screen {
+    --login-phone-scale: clamp(0.6, 0.52 + 0.18 * (100vw / 1400px), 0.82);
+    --login-stage-gap: 0.45rem;
+    --login-copy-gap: 0.7rem;
+    --login-title-size: clamp(1.3rem, 1.1rem + 0.7vw, 1.75rem);
+  }
+
+  .login-visual-stage,
+  .login-showcase {
+    min-height: 11.5rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .login-chip {
+    display: none;
+  }
+
+  .login-screen {
+    --login-phone-scale: 0.56;
+    --login-title-size: 1.3rem;
+  }
+}
+
+/* Pantallas grandes: crece un poco, sin separar de más */
+@media (min-height: 900px) and (min-width: 1280px) {
+  .login-screen {
+    --login-phone-scale: clamp(0.95, 0.88 + 0.28 * ((100vh - 900px) / 400px), 1.18);
+    --login-copy-gap: clamp(1rem, 2.5vh, 1.85rem);
+    --login-title-size: clamp(1.7rem, 1.35rem + 0.55vw, 2.15rem);
+  }
+
+  .login-visual-stage {
+    min-height: clamp(20rem, 42vh, 34rem);
+  }
+}
+
+/* Laptop 13–14": reduce chips laterales que se pisan */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .login-chip.login-float-c,
+  .login-chip.login-float-e {
+    display: none;
+  }
+
+  .login-screen {
+    --login-phone-scale: clamp(0.68, 0.62 + 0.14 * (100vh / 900px), 0.9);
+  }
+}
+
+/* Float un poco más notorio en iPhone y cards */
 @keyframes login-float-y {
   from {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(0, -12px, 0);
+    transform: translate3d(0, -11px, 0);
   }
 }
 
 .login-float {
-  will-change: transform;
-  backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
-  animation: login-float-y 5.5s ease-in-out infinite alternate;
+  animation: login-float-y 5.8s ease-in-out infinite alternate;
 }
 
-/* Cada tarjeta con delay distinto para que no se muevan iguales */
 .login-float-a {
-  animation-duration: 6.5s;
+  animation-duration: 6.2s;
   animation-delay: 0s;
 }
 
 .login-float-b {
-  animation-duration: 5.2s;
-  animation-delay: -1.2s;
+  animation-duration: 5.4s;
+  animation-delay: -1s;
 }
 
 .login-float-c {
   animation-duration: 6s;
-  animation-delay: -2.4s;
+  animation-delay: -2.2s;
 }
 
 .login-float-d {
-  animation-duration: 5.8s;
-  animation-delay: -0.6s;
+  animation-duration: 5.6s;
+  animation-delay: -0.5s;
 }
 
 .login-float-e {
-  animation-duration: 6.8s;
-  animation-delay: -3s;
+  animation-duration: 6.4s;
+  animation-delay: -2.8s;
 }
 
-/* iPhone de frente (sin rotar) + sombra para que no se vea plano */
 .login-iphone-front {
   position: relative;
-  filter: drop-shadow(0 28px 40px rgba(0, 0, 0, 0.55));
 }
 
 .login-iphone-glow {
-  pointer-events: none;
-  position: absolute;
-  inset: 8% 12% 6% 12%;
-  border-radius: 2.5rem;
-  background: radial-gradient(ellipse at 40% 20%, rgba(244, 114, 182, 0.22), transparent 55%);
-  filter: blur(18px);
-  z-index: 0;
+  display: none;
 }
 
-.login-iphone-front > *:not(.login-iphone-glow) {
-  position: relative;
-  z-index: 1;
+/* Sombra unida a la silueta del iPhone (sigue el PNG), solo hacia abajo */
+.login-iphone-shadow {
+  filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.4));
 }
 
 .login-iphone-screen {
   isolation: isolate;
 }
 
-/* Brillo suave encima de la pantalla del mockup */
 .login-iphone-shine {
   pointer-events: none;
   position: absolute;
@@ -221,23 +439,49 @@ body {
   z-index: 20;
   background: linear-gradient(
     115deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.06) 12%,
-    transparent 28%,
-    transparent 62%,
-    rgba(255, 255, 255, 0.04) 100%
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 16%,
+    transparent 100%
   );
-  mix-blend-mode: screen;
 }
 
-/* Manita en botones del form (olvidé pass, entrar, registro, etc.) */
+/*
+  Cards: sombra unida al border-radius (misma silueta redondeada),
+  solo hacia abajo (offset Y positivo, sin rectángulo suelto debajo).
+*/
+.login-chip {
+  box-shadow: 0 10px 18px -2px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-float {
+    animation: none;
+  }
+}
+
+/* Manita en botones del form (entrar, registro, olvidé pass, etc.) */
 .login-form button:not(:disabled),
 .login-form + div button {
   cursor: pointer;
 }
 
+/* Scrollbar del menú Día/Mes/Año (que combine con el tema oscuro) */
+.birth-picker-menu {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.birth-picker-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.birth-picker-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
 /* Toggle Recordar sesión — basado en Uiverse (PriyanshuGupta28)
-   Colores adaptados al diseño: neon rosa del proyecto */
+   Le cambié los colores al neon rosa del proyecto */
 .toggle {
   position: relative;
   width: 44px;
@@ -258,7 +502,7 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.15s ease;
 }
 
 .toggle label::before {
@@ -271,7 +515,7 @@ body {
   border-radius: 50%;
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease;
+  transition: transform 0.15s ease;
 }
 
 .toggle input:checked + label {
@@ -300,4 +544,13 @@ body {
 
 .toggle input:focus-visible + label {
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-neon) 45%, transparent);
+}
+
+/* Track + fill de la barrita de seguridad (el color lo pone Tailwind según el score) */
+.password-strength-track {
+  min-width: 0;
+}
+
+.password-strength-fill {
+  min-width: 0;
 }
