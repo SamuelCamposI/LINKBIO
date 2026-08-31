@@ -8,9 +8,11 @@
  *
  * Demo: samuel@gmail.com / 1234
  *
- * Notas mías:
- * - La fecha de nacimiento va con dropdowns custom (el <select> nativo se ve horrible)
- * - Los mensajes de error/éxito son temporales (FlashAlert)
+ * Notas:
+ * - Fecha de nacimiento con dropdowns custom (el <select> nativo se ve feo)
+ * - Errores/éxitos temporales con FlashAlert
+ * - Configuré correo, pass y “Recordar sesión” precargados pa' la demo
+ *   (así el compañero no anda adivinando credenciales)
  */
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 // Mockup real de iPhone (frame oficial). Solo uso el Silver en /public/mockify
@@ -28,7 +30,6 @@ import {
   clearPasswordReset,
   completePasswordReset,
   getCurrentDemoPassword,
-  getRememberPreference,
   login,
   register,
   requestPasswordReset,
@@ -371,9 +372,10 @@ export default function Login({ onSuccess }: LoginProps) {
   const [mode, setMode] = useState<AuthMode>('login')
 
   // --- Login state ---
-  const [remember, setRemember] = useState(() => getRememberPreference())
-  const [email, setEmail] = useState(() => (getRememberPreference() ? DEMO_EMAIL : ''))
-  const [password, setPassword] = useState(() => (getRememberPreference() ? getCurrentDemoPassword() : ''))
+  // Precargados pa' la demo del equipo (correo + pass + recordar)
+  const [remember, setRemember] = useState(true)
+  const [email, setEmail] = useState(DEMO_EMAIL)
+  const [password, setPassword] = useState(() => getCurrentDemoPassword())
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -571,13 +573,7 @@ export default function Login({ onSuccess }: LoginProps) {
   const handleRememberChange = (checked: boolean) => {
     setRemember(checked)
     setRememberPreference(checked)
-    if (checked) {
-      setEmail(DEMO_EMAIL)
-      setPassword(getCurrentDemoPassword())
-    } else {
-      setEmail('')
-      setPassword('')
-    }
+    // No limpio correo/pass al apagar el toggle — en demo conviene que se vean igual
   }
 
   const handleLoginSubmit = async (event: FormEvent) => {
@@ -1457,17 +1453,18 @@ function PasswordStrengthMeter({
 
 // Redes que muestro DENTRO del iPhone (colores oficiales de cada marca)
 const PREVIEW_LINKS = [
-  { label: 'YouTube', Icon: FaYoutube, iconClass: 'bg-[#FF0000] text-white', accent: '#FF0000' },
-  { label: 'TikTok', Icon: FaTiktok, iconClass: 'bg-black text-white ring-1 ring-[#25F4EE]/50', accent: '#FE2C55' },
+  { label: 'YouTube', Icon: FaYoutube, iconClass: 'bg-[#FF0000] text-white' },
+  { label: 'TikTok', Icon: FaTiktok, iconClass: 'bg-black text-white ring-1 ring-[#25F4EE]/50' },
   {
     label: 'Instagram',
     Icon: FaInstagram,
     iconClass: 'bg-[linear-gradient(45deg,#f9ce34_0%,#ee2a7b_45%,#6228d7_100%)] text-white',
-    accent: '#E1306C',
   },
-  { label: 'Spotify', Icon: FaSpotify, iconClass: 'bg-[#1DB954] text-white', accent: '#1DB954' },
-  { label: 'Facebook', Icon: FaFacebook, iconClass: 'bg-[#1877F2] text-white', accent: '#1877F2' },
+  { label: 'Spotify', Icon: FaSpotify, iconClass: 'bg-[#1DB954] text-white' },
+  { label: 'Facebook', Icon: FaFacebook, iconClass: 'bg-[#1877F2] text-white' },
 ] as const
+
+const LOGIN_PHONE_ACCENT = '#ec4899'
 
 /**
  * LoginShowcase
@@ -1522,24 +1519,30 @@ function LoginShowcase() {
                 </div>
 
                 {/* Contenido tipo perfil: avatar + bio + links */}
-                <div className="relative z-10 mt-8 flex flex-col items-center text-center">
-                  <div className="rounded-full p-[2px] ring-2 ring-neon/40">
+                <div className="relative z-10 mt-9 flex flex-col items-center text-center">
+                  <div
+                    className="rounded-full p-[2.5px]"
+                    style={{ background: LOGIN_PHONE_ACCENT }}
+                  >
                     <img
                       src="/avatar.png"
                       alt=""
-                      className="size-14 rounded-full object-cover"
+                      className="block size-12 rounded-full object-cover"
                       draggable={false}
                     />
                   </div>
-                  <h3 className="mt-3 font-display text-[0.95rem] font-extrabold tracking-tight text-neon-soft">
+                  <h3
+                    className="mt-3.5 font-display text-[0.95rem] font-extrabold tracking-tight"
+                    style={{ color: LOGIN_PHONE_ACCENT }}
+                  >
                     Tu página
                   </h3>
-                  <p className="mt-1 max-w-[11rem] text-[10px] font-medium leading-snug text-white/55">
+                  <p className="mt-1.5 max-w-[11rem] text-[10px] font-medium leading-snug text-white/55">
                     Contenido, ritmo y vibes diarias
                   </p>
 
-                  <div className="mt-3.5 w-full space-y-1.5">
-                    {PREVIEW_LINKS.map(({ label, Icon, iconClass, accent }) => (
+                  <div className="mt-4 flex w-full flex-col gap-2">
+                    {PREVIEW_LINKS.map(({ label, Icon, iconClass }) => (
                       <div
                         key={label}
                         className="flex min-h-[2.35rem] items-center gap-2 rounded-xl border border-white/15 bg-plum/70 px-2.5 backdrop-blur-md"
@@ -1550,7 +1553,7 @@ function LoginShowcase() {
                           <Icon className="size-3" />
                         </span>
                         <span className="flex-1 text-left text-[10px] font-extrabold tracking-wide">{label}</span>
-                        <ArrowUpRight className="size-3" style={{ color: accent }} strokeWidth={2.5} />
+                        <ArrowUpRight className="size-3 shrink-0" style={{ color: LOGIN_PHONE_ACCENT }} strokeWidth={2.5} />
                       </div>
                     ))}
                   </div>
