@@ -39,6 +39,7 @@ import { startTransition, useEffect, useMemo, useRef, useState, memo, type Chang
 import { DeviceMockup, iPhone17Pro } from '@mockifydev/react'
 import { getSession, isAuthenticated, logout } from './auth'
 import Login from './Login'
+import { supabase } from './utils/supabase'
 import { BrandIcon } from './brandIcons'
 import { loadProfile, saveProfile, type ProfileConfig, type ProfileIcon } from './profileConfig'
 import type { IconType } from 'react-icons'
@@ -55,6 +56,9 @@ import {
   SiX,
   SiYoutube,
 } from 'react-icons/si'
+
+
+
 
 type TabId = 'inicio' | 'estadisticas' | 'personalizacion' | 'suscripciones'
 
@@ -323,6 +327,25 @@ export default function App() {
     document.addEventListener('mousedown', onPointer)
     return () => document.removeEventListener('mousedown', onPointer)
   }, [profileOpen])
+//USEEFFECT PARA PROBAR CONEXION A SUPABASE
+  useEffect(() => {
+  async function testSupabaseConnection() {
+    const { data, error } = await supabase
+      .from('prueba')
+      .select('*')
+      .limit(1)
+
+    if (error) {
+      console.error('❌ Error con Supabase:', error)
+      return
+    }
+
+    console.log('✅ Supabase conectado correctamente')
+    console.log('Datos recibidos:', data)
+  }
+
+  testSupabaseConnection()
+}, [])
 
   if (!authed) return <Login onSuccess={() => setAuthed(true)} />
 

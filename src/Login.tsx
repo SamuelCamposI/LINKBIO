@@ -6,8 +6,6 @@
  * - Registro (2 pasos: datos + seguridad)
  * - Olvidé mi contraseña (correo → código OTP → nueva pass)
  *
- * Demo: samuel@gmail.com / 1234
- *
  * Notas:
  * - Fecha de nacimiento con dropdowns custom (el <select> nativo se ve feo)
  * - Errores/éxitos temporales con FlashAlert
@@ -48,7 +46,6 @@ import {
 } from './passwordStrength'
 
 // Mismos datos del .env para simular que "ya hay DB" cuando recuerda sesión
-const DEMO_EMAIL = (import.meta.env.VITE_DEMO_EMAIL as string | undefined) ?? 'samuel@gmail.com'
 
 type AuthMode = 'login' | 'register' | 'forgot'
 
@@ -372,9 +369,8 @@ export default function Login({ onSuccess }: LoginProps) {
   const [mode, setMode] = useState<AuthMode>('login')
 
   // --- Login state ---
-  // Precargados pa' la demo del equipo (correo + pass + recordar)
   const [remember, setRemember] = useState(true)
-  const [email, setEmail] = useState(DEMO_EMAIL)
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState(() => getCurrentDemoPassword())
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -573,7 +569,6 @@ export default function Login({ onSuccess }: LoginProps) {
   const handleRememberChange = (checked: boolean) => {
     setRemember(checked)
     setRememberPreference(checked)
-    // No limpio correo/pass al apagar el toggle — en demo conviene que se vean igual
   }
 
   const handleLoginSubmit = async (event: FormEvent) => {
